@@ -1,19 +1,25 @@
 const socket = io();
 
-// --- ログイン処理 ---
-const loginBtn = document.getElementById("loginBtn");
-const usernameInput = document.getElementById("username");
+// 要素取得
 const loginForm = document.getElementById("loginForm");
+const usernameInput = document.getElementById("username");
+const loginBtn = document.getElementById("loginBtn");
 const chatUI = document.getElementById("chatUI");
+const messagesDiv = document.getElementById("messages");
+const messageInput = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const notifySound = document.getElementById("notifySound");
 
+// ローカルストレージからユーザー名復元
 let myName = localStorage.getItem("username");
 if (myName) startChat(myName);
 
 loginBtn.addEventListener("click", () => {
   const name = usernameInput.value.trim();
-  if (!name) return alert("名前を入力してください");
-  localStorage.setItem("username", name);
-  startChat(name);
+  if (name) {
+    localStorage.setItem("username", name);
+    startChat(name);
+  }
 });
 
 function startChat(name) {
@@ -23,45 +29,55 @@ function startChat(name) {
   chatUI.style.display = "block";
 }
 
-// --- メッセージ送信 ---
-const msgInput = document.getElementById("msgInput");
-const sendBtn = document.getElementById("sendBtn");
-const messagesDiv = document.getElementById("messages");
+// 過去ログ表示
+socket.on("history", (msgs) => {
+  msgs.forEach(displayMessage);
+});
 
-sendBtn.addEventListener("click", sendMessage);
-msgInput.addEventListener("keypress", (e) => { if(e.key==='Enter') sendMessage(); });
-
-function sendMessage() {
-  const text = msgInput.value.trim();
-  if (!text) return;
-  socket.emit("message", { text });
-  msgInput.value = '';
-}
-
-// --- メッセージ受信 ---
+// メッセージ受信
 socket.on("message", (msg) => {
   displayMessage(msg);
-  // 既読をサーバーに通知
-  socket.emit("message-read", { messageId: msg.id, user: myName });
+  if (msg.sender !== myName) notifySound.play();
 });
 
+// 既読更新受信
 socket.on("update-read", ({ messageId, readBy }) => {
-  const msgElem = document.getElementById(messageId);
-  if (msgElem) msgElem.querySelector(".read-status").textContent = `既読: ${readBy.join(", ")}`;
+  const el = document.getElementById(messageId);
+  if (el) el.querySelector(".read-status").textContent = `既読: ${readBy.join(", ")}`;
 });
 
-// --- 表示関数 ---
-function displayMessage(msg) {
-  const div = document.createElement("div");
-  div.className = "message";
-  div.id = msg.id;
-  div.innerHTML = `<strong>${msg.sender}</strong> [${new Date(msg.timestamp).toLocaleTimeString()}]: ${msg.text} <span class="read-status"></span>`;
-  messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+// メッセージ送信
+sendBtn.addEventListener("click", sendMessage);
+messageInput.addEventListener("keypress", (e) => {
+  if (e.key === "Enter") sendMessage();
+});
 
-  // 通知音
+function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text) return;
+  socket.emit("message", text);
+  messageInput.value = "";
+}
+
+// メッセージ表示関数
+function displayMessage(msg) {
+  let el = document.getElementById(msg.id);
+  if (!el) {
+    el = document.createElement("div");
+    el.id = msg.id;
+    el.className = "message " + (msg.sender === myName ? "me" : "other");
+    el.innerHTML = `
+      <strong>${msg.sender}</strong> 
+      <span class="timestamp">${msg.timestamp}</span><br>
+      ${msg.text}
+      <div class="read-status">既読: ${msg.readBy.join(", ")}</div>
+    `;
+    messagesDiv.appendChild(el);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  // 既読報告
   if (msg.sender !== myName) {
-    const audio = new Audio("notification.mp3"); // notification.mp3 を用意
-    audio.play();
+    socket.emit("message-read", { messageId: msg.id });
   }
 }

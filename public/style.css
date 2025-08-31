@@ -1,0 +1,135 @@
+/* 全体背景とフォント */
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background: #e5ddd5;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* ログイン画面 */
+#loginForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+#loginForm input {
+  padding: 10px;
+  font-size: 16px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+#loginForm button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #00bfa5;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#loginForm button:hover {
+  background-color: #009e8f;
+}
+
+/* チャット画面 */
+#chatUI {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 10px;
+}
+
+/* メッセージ一覧 */
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 個々のメッセージ */
+.message {
+  padding: 8px 12px;
+  border-radius: 15px;
+  margin-bottom: 8px;
+  max-width: 70%;
+  word-wrap: break-word;
+  position: relative;
+  clear: both;
+}
+
+/* 自分のメッセージ */
+.message.me {
+  background-color: #dcf8c6;
+  align-self: flex-end;
+}
+
+/* 他人のメッセージ */
+.message.other {
+  background-color: #fff;
+  align-self: flex-start;
+}
+
+/* 送信者名と時間 */
+.message strong {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.message .timestamp {
+  font-size: 0.7em;
+  color: gray;
+  position: absolute;
+  bottom: -15px;
+  right: 10px;
+}
+
+/* 既読表示 */
+.read-status {
+  font-size: 0.7em;
+  color: gray;
+  margin-top: 2px;
+  text-align: right;
+}
+
+/* 入力エリア */
+#inputArea {
+  display: flex;
+}
+
+#messageInput {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+#sendBtn {
+  padding: 10px 20px;
+  margin-left: 10px;
+  font-size: 16px;
+  background-color: #00bfa5;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+#sendBtn:hover {
+  background-color: #009e8f;
+}

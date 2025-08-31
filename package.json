@@ -1,7 +1,6 @@
 {
   "name": "ntchat",
   "version": "1.0.0",
-  "description": "ブラウザチャットアプリ（名前・時間・通知音付き）",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
